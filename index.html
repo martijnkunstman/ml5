@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Getting Started with ml5.js</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- p5 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/addons/p5.sound.min.js"></script>
+    <!-- ml5 -->
+    <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+  </head>
+
+  <body>
+    <video id="video" width="400" height="400" autoplay></video>
+    <script>
+      // Your code will go here
+      // open up your console - if everything loaded properly you should see the latest ml5 version
+      console.log("ml5 version:", ml5.version);
+
+      let handpose;
+      let video;
+      let hands = [];
+
+      function setup() {
+        createCanvas(640, 480);
+        video = createCapture(VIDEO);
+        video.size(width, height);
+
+        handpose = ml5.handpose(video, modelReady);
+
+        // This sets up an event that fills the global variable "predictions"
+        // with an array every time new hand poses are detected
+        handpose.on("hand", (results) => {
+          hands = results;
+        });
+
+        // Hide the video element, and just show the canvas
+        video.hide();
+      }
+
+      function modelReady() {
+        console.log("Model ready!");
+      }
+
+      function draw() {
+        image(video, 0, 0, width, height);
+
+        // We can call both functions to draw all keypoints and the skeletons
+        drawKeypoints();
+      }
+
+      // A function to draw ellipses over the detected keypoints
+      function drawKeypoints() {
+        for (let i = 0; i < hands.length; i += 1) {
+          const hand = hands[i];
+          for (let j = 0; j < hand.landmarks.length; j += 1) {
+            const keypoint = hand.landmarks[j];
+            fill(0, 255, 0);
+            noStroke();
+            ellipse(keypoint[0], keypoint[1], 10, 10);
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
